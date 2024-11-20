@@ -1,13 +1,18 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.MapGet("/", () => "Hello World!");
+app.MapPost("/create", (MyData data) => Results.Created($"/create/{data.Name}", data));
+app.MapPut("/update/{id}", (int id, MyData data) => Results.NoContent());
+app.MapDelete("/delete/{id}", (int id) => Results.NoContent());
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer(); // Adds support for API explorer, which is used by Swagger.
 builder.Services.AddSwaggerGen(); // Adds support for generating Swagger documents.
-
-var app = builder.Build(); // Builds the WebApplication.
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -17,11 +22,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection(); // Redirects HTTP requests to HTTPS.
-
-// Define a simple GET endpoint that returns "Hello World!".
-app.MapGet("/", () => "Hello World!");
-
-app.Run(); // Runs the application.
 
 // Endpoint to calculate days between two dates.
 app.MapGet("/daysbetweendates", (DateTime date1, DateTime date2) =>
@@ -62,19 +62,10 @@ app.MapGet("/returncolorcode", async (string color) =>
     var colorData = colors?.FirstOrDefault(c => c.Name.Equals(color, StringComparison.OrdinalIgnoreCase));
     if (colorData != null)
     {
-        return Results.Ok(colorData.Rgba);
+        return Results.Ok(colorData.Code.RGBA); // Fix property name to RGBA
     }
     return Results.NotFound("Color not found");
 });
-
-app.Run(); // Runs the application.
-
-public class Color
-{
-    public string Name { get; set; }
-    public string Rgba { get; set; }
-    public string Hex { get; set; }
-}
 
 // Endpoint to return a random joke from the joke API.
 // Makes a call to the joke API and returns a random joke.
@@ -94,7 +85,7 @@ app.MapGet("/moviesbydirector", async (string director) =>
     var client = new HttpClient();
     var response = await client.GetAsync($"https://api.themoviedb.org/3/search/person?api_key=de804e50&query={director}");
     var directorData = await response.Content.ReadAsStringAsync();
-    var directorId = JsonSerializer.Deserialize<Director>(directorData).Results.FirstOrDefault()?.Id;
+    var directorId = JsonSerializer.Deserialize<Director>(directorData)?.Results.FirstOrDefault()?.Id; // Handle possible null reference
 
     if (directorId != null)
     {
@@ -124,8 +115,6 @@ app.MapGet("/parseurl", (string someurl) =>
     return Results.Ok(parsedUrl);
 });
 
-app.Run(); // Runs the application.
-
 // Endpoint to list files in the current directory.
 // Gets the current directory and returns the list of files.
 app.MapGet("/listfiles", () =>
@@ -134,8 +123,6 @@ app.MapGet("/listfiles", () =>
     return Results.Ok(files);
 });
 
-app.Run(); // Runs the application.
-
 // Endpoint to return the memory consumption of the process in GB.
 // Returns the memory consumption of the process in GB, rounded to 2 decimals.
 app.MapGet("/calculatememoryconsumption", () =>
@@ -143,8 +130,6 @@ app.MapGet("/calculatememoryconsumption", () =>
     var memory = Process.GetCurrentProcess().WorkingSet64 / (1024 * 1024 * 1024.0);
     return Results.Ok(Math.Round(memory, 2));
 });
-
-app.Run(); // Runs the application.
 
 // Endpoint to return a random European country.
 app.MapGet("/randomeuropeancountry", () =>
@@ -168,8 +153,7 @@ app.MapGet("/randomeuropeancountry", () =>
     return Results.Ok(randomCountry);
 });
 
-app.Run(); // Runs the application.
+app.Run();
 
-// Needed to be able to access this type from the MinimalAPI.Tests project.
 public partial class Program
 { }
