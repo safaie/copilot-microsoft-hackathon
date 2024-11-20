@@ -4,48 +4,46 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer(); // Adds support for API explorer, which is used by Swagger.
+builder.Services.AddSwaggerGen(); // Adds support for generating Swagger documents.
 
-var app = builder.Build();
+var app = builder.Build(); // Builds the WebApplication.
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(); // Enables middleware to serve generated Swagger as a JSON endpoint.
+    app.UseSwaggerUI(); // Enables middleware to serve Swagger UI.
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // Redirects HTTP requests to HTTPS.
 
-// ADD NEW ENDPOINTS HERE
+// Define a simple GET endpoint that returns "Hello World!".
 app.MapGet("/", () => "Hello World!");
 
-app.Run();
+app.Run(); // Runs the application.
 
-// DaysBetweenDates
+// Endpoint to calculate days between two dates.
 app.MapGet("/daysbetweendates", (DateTime date1, DateTime date2) =>
 {
     var daysBetween = (date2 - date1).TotalDays;
     return Results.Ok(daysBetween);
 });
 
-// validatephonenumber
-// receive by querystring a parameter called phoneNumber
-// validate phoneNumber with Spanish format, for example +34666777888
-// if phoneNumber is valid return true
-// if phoneNumber is not valid return false
+// Endpoint to validate a phone number in Spanish format.
+// Receives a parameter called phoneNumber via query string.
+// Validates phoneNumber with Spanish format, for example +34666777888.
+// Returns true if phoneNumber is valid, otherwise false.
 app.MapGet("/validatephonenumber", (string phoneNumber) =>
 {
     var isValid = Regex.IsMatch(phoneNumber, @"^\+[1-9]{1}[0-9]{3,14}$");
     return Results.Ok(isValid);
 });
 
-// validatespanishdni
-// receive by querystring a parameter called dni
-// calculate DNI letter
-// if DNI is valid return "valid"
-// if DNI is not valid return "invalid"
+// Endpoint to validate a Spanish DNI.
+// Receives a parameter called dni via query string.
+// Calculates DNI letter and checks if it is valid.
+// Returns "valid" if DNI is valid, otherwise "invalid".
 app.MapGet("/validatespanishdni", (string dni) =>
 {
     var dniNumber = int.Parse(dni.Substring(0, 8));
@@ -55,7 +53,7 @@ app.MapGet("/validatespanishdni", (string dni) =>
     return Results.Ok(valid ? "valid" : "invalid");
 });
 
-// returncolorcode
+// Endpoint to return the RGBA value of a color from colors.json.
 app.MapGet("/returncolorcode", async (string color) =>
 {
     var colorsJson = await File.ReadAllTextAsync("colors.json");
@@ -69,7 +67,7 @@ app.MapGet("/returncolorcode", async (string color) =>
     return Results.NotFound("Color not found");
 });
 
-app.Run();
+app.Run(); // Runs the application.
 
 public class Color
 {
@@ -78,8 +76,8 @@ public class Color
     public string Hex { get; set; }
 }
 
-// tellmeajoke
-// Make a call to the joke api and return a random joke
+// Endpoint to return a random joke from the joke API.
+// Makes a call to the joke API and returns a random joke.
 app.MapGet("/tellmeajoke", async () =>
 {
     var client = new HttpClient();
@@ -88,10 +86,9 @@ app.MapGet("/tellmeajoke", async () =>
     return Results.Ok(joke);
 });
 
-// moviesbytitle
-// Receive by querystring a parameter called director
-// Make a call to the movie api and return a list of movies of that director
-// Return the full list of movies
+// Endpoint to return a list of movies by a director from the movie API.
+// Receives a parameter called director via query string.
+// Makes a call to the movie API and returns a list of movies by that director.
 app.MapGet("/moviesbydirector", async (string director) =>
 {
     var client = new HttpClient();
@@ -109,10 +106,9 @@ app.MapGet("/moviesbydirector", async (string director) =>
     return Results.NotFound("Director not found");
 });
 
-// parseurl
-// Retrieves a parameter from querystring called someurl
-// Parse the url and return the protocol, host, port, path, querystring and hash
-// Return the parsed host
+// Endpoint to parse a URL and return its components.
+// Receives a parameter called someurl via query string.
+// Parses the URL and returns the protocol, host, port, path, query string, and hash.
 app.MapGet("/parseurl", (string someurl) =>
 {
     var uri = new Uri(someurl);
@@ -128,31 +124,29 @@ app.MapGet("/parseurl", (string someurl) =>
     return Results.Ok(parsedUrl);
 });
 
-app.Run();
+app.Run(); // Runs the application.
 
-// listfiles
-// Get the current directory
-// Get the list of files in the current directory
-// Return the list of files
+// Endpoint to list files in the current directory.
+// Gets the current directory and returns the list of files.
 app.MapGet("/listfiles", () =>
 {
     var files = Directory.GetFiles(Directory.GetCurrentDirectory());
     return Results.Ok(files);
 });
 
-app.Run();
+app.Run(); // Runs the application.
 
-// calculatememoryconsumption
-// Return the memory consumption of the process in GB, rounded to 2 decimals
+// Endpoint to return the memory consumption of the process in GB.
+// Returns the memory consumption of the process in GB, rounded to 2 decimals.
 app.MapGet("/calculatememoryconsumption", () =>
 {
     var memory = Process.GetCurrentProcess().WorkingSet64 / (1024 * 1024 * 1024.0);
     return Results.Ok(Math.Round(memory, 2));
 });
 
-app.Run();
+app.Run(); // Runs the application.
 
-// randomeuropeancountry
+// Endpoint to return a random European country.
 app.MapGet("/randomeuropeancountry", () =>
 {
     var countries = new[]
@@ -174,9 +168,7 @@ app.MapGet("/randomeuropeancountry", () =>
     return Results.Ok(randomCountry);
 });
 
-app.Run();
-
-
+app.Run(); // Runs the application.
 
 // Needed to be able to access this type from the MinimalAPI.Tests project.
 public partial class Program
