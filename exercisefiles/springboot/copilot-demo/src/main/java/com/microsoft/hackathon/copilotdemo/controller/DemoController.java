@@ -43,4 +43,11 @@ public class DemoController {
         logger.info("Validating phone number: {} - Result: {}", phoneNumber, isValid);
         return isValid;
     }
+
+    @GetMapping("/validateDNI")
+    public boolean validateDNI(@RequestParam String dni) {
+        boolean isValid = dni.matches("\\d{8}[A-Za-z]");
+        logger.info("Validating DNI: {} - Result: {}", dni, isValid);
+        return isValid;
+    }
 }

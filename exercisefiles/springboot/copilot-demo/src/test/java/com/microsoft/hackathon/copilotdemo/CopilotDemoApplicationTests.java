@@ -73,6 +73,13 @@ class CopilotDemoApplicationTests {
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
     }
 
+    @Test
+    void testValidateDNIEndpoint() {
+        String url = "http://localhost:" + port + "/validateDNI?dni=12345678A";
+        ResponseEntity<Boolean> response = restTemplate.getForEntity(url, Boolean.class);
+        assertThat(response.getBody()).isTrue();
+    }
+
 }
 
 
