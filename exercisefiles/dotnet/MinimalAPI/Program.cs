@@ -2,17 +2,17 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddEndpointsApiExplorer(); // Adds support for API explorer, which is used by Swagger.
+builder.Services.AddSwaggerGen(); // Adds support for generating Swagger documents.
+
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 app.MapPost("/create", (MyData data) => Results.Created($"/create/{data.Name}", data));
 app.MapPut("/update/{id}", (int id, MyData data) => Results.NoContent());
 app.MapDelete("/delete/{id}", (int id) => Results.NoContent());
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer(); // Adds support for API explorer, which is used by Swagger.
-builder.Services.AddSwaggerGen(); // Adds support for generating Swagger documents.
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
