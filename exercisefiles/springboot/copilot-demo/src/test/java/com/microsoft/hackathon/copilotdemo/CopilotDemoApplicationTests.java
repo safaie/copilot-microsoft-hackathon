@@ -44,15 +44,9 @@ class CopilotDemoApplicationTests {
 
     @Test
     void testHelloNoKey() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/hello", String.class);
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
-        assertThat(response.getBody()).isEqualTo("key not passed");
-    }
-
-    @Test
-    void testHelloWithoutKey() {
         String url = "http://localhost:" + port + "/hello";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo("key not passed");
     }
 
@@ -60,6 +54,7 @@ class CopilotDemoApplicationTests {
     void testHelloWithKey() {
         String url = "http://localhost:" + port + "/hello?key=world";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo("hello world");
     }
 
@@ -67,7 +62,15 @@ class CopilotDemoApplicationTests {
     void testDiffDates() {
         String url = "http://localhost:" + port + "/diffdates?date1=01-01-2020&date2=10-01-2020";
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo("Difference in days: 9");
+    }
+
+    @Test
+    void testValidatePhoneNumberValid() {
+        String url = "http://localhost:" + port + "/validatePhoneNumber?phoneNumber=+34612345678";
+        ResponseEntity<Boolean> response = restTemplate.getForEntity(url, Boolean.class);
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
     }
 
 }
